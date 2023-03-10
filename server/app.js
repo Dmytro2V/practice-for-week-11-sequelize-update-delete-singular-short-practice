@@ -21,12 +21,40 @@ app.get('/puppies', async (req, res, next) => {
 // STEP 1: Update a puppy by id
 app.put('/puppies/:puppyId', async (req, res, next) => {
     // Your code here
+    let id = req.params.puppyId;    
+    let puppyToUpdateById = await Puppy.findByPk(id);
+    if (req.body.age_yrs) puppyToUpdateById.age_yrs = req.body.age_yrs;
+    if (req.body.weight_lbs) puppyToUpdateById.weight_lbs = req.body.weight_lbs;
+    if (req.body.microchipped) puppyToUpdateById.microchipped = req.body.microchipped;
+    await puppyToUpdateById.save();
+    let updatedPuppy = await Puppy.findByPk(id);
+    res.json({
+        message: 'Puppy succesfully updated, rereading new value:',
+        puppy: updatedPuppy
+    });
+
 })
 
 
 // STEP 2: Delete a puppy by id
 app.delete('/puppies/:puppyId', async (req, res, next) => {
     // Your code here
+    let id = req.params.puppyId;    
+    let puppyToDeleteById = await Puppy.findByPk(id);
+        puppyToDeleteById.destroy();
+    let deletedPuppy = await Puppy.findByPk(id);
+    if (!deletedPuppy) {
+        res.json({
+            message: 'Puppy id #' + id + ' succesfully deleted',
+            puppy: puppyToDeleteById
+        });
+    } else {
+        throw new Error ('Puppy id #' + id + ' did not deleted');
+        //res.json({
+        //    message: 'Puppy id #' + id + ' did not deleted'
+        //})
+    };
+
 })
 
 
